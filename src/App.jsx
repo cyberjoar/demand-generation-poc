@@ -22,6 +22,52 @@ import {
   Building
 } from 'lucide-react';
 
+const VisualSourceTooltip = ({ snippet }) => (
+  <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 max-w-[90vw] shadow-2xl animate-in fade-in zoom-in-95 pointer-events-none">
+    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col shadow-lg">
+      <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between items-center">
+        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1">
+          <Eye size={10} /> OCR Verification
+        </span>
+        <span className="text-[9px] text-blue-600 font-bold truncate max-w-[120px]">{snippet.title}</span>
+      </div>
+      <div className="p-3 bg-white relative">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }}></div>
+        <p className="text-[10px] leading-relaxed text-slate-600 italic font-serif relative z-10 border-l-2 border-blue-200 pl-2">
+          "{snippet.text}"
+        </p>
+      </div>
+    </div>
+    <div className="w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45 mx-auto -mt-1.5 relative z-[101]"></div>
+  </div>
+);
+
+const EditableField = ({ label, value, onChange, snippet, className = "", highlight = false, badge }) => (
+  <div className={`p-4 bg-white border border-slate-200 rounded-xl group relative transition-all duration-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50/50 focus-within:z-10 overflow-visible ${className}`}>
+    <div className="flex justify-between items-center mb-2">
+      <div className="flex items-center gap-2">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</label>
+        {badge}
+      </div>
+      {snippet && (
+        <div className="relative group/tooltip z-20 bg-white!">
+          <button className="text-slate-300 hover:text-blue-600 transition-colors p-1 rounded-md hover:bg-blue-50 cursor-pointer">
+            <Info size={14} />
+          </button>
+          <div className="hidden group-hover/tooltip:block">
+            <VisualSourceTooltip snippet={snippet} />
+          </div>
+        </div>
+      )}
+    </div>
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={`w-full font-semibold bg-transparent border-none p-0 focus:outline-none text-sm ${highlight ? 'text-blue-600' : 'text-slate-800'}`}
+    />
+  </div>
+);
+
 const App = () => {
   const [step, setStep] = useState('upload');
   const [isDragging, setIsDragging] = useState(false);
@@ -98,7 +144,7 @@ Address: ${tenantInfo.address}
 Reference: LEASE-REF-9920
 Date: ${new Date().toLocaleDateString()}
 
-TAKE NOTICE that we act on behalf of ${clientInfo.name} ("the Landlord"). 
+TAKE NOTICE that we act on behalf of ${clientInfo.name} ("the Landlord").
 
 Our records demonstrate a total outstanding balance of £${leaseClauses.totalDue}. This sum is comprised of:
 - Principal Arrears: £${leaseClauses.totalPrincipal}
@@ -114,52 +160,6 @@ For and on behalf of ${clientInfo.name}`;
     setFinalDoc(doc);
     setStep('final');
   };
-
-  const VisualSourceTooltip = ({ snippet }) => (
-    <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 max-w-[90vw] shadow-2xl animate-in fade-in zoom-in-95 pointer-events-none">
-      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col shadow-lg">
-        <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between items-center">
-          <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1">
-            <Eye size={10} /> OCR Verification
-          </span>
-          <span className="text-[9px] text-blue-600 font-bold truncate max-w-[120px]">{snippet.title}</span>
-        </div>
-        <div className="p-3 bg-white relative">
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }}></div>
-          <p className="text-[10px] leading-relaxed text-slate-600 italic font-serif relative z-10 border-l-2 border-blue-200 pl-2">
-            "{snippet.text}"
-          </p>
-        </div>
-      </div>
-      <div className="w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45 mx-auto -mt-1.5 relative z-[101]"></div>
-    </div>
-  );
-
-  const EditableField = ({ label, value, onChange, snippet, className = "", highlight = false, badge }) => (
-    <div className={`p-4 bg-white border border-slate-200 rounded-xl group relative transition-all duration-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50/50 focus-within:z-10 ${className}`}>
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</label>
-          {badge}
-        </div>
-        {snippet && (
-          <div className="relative group/tooltip z-20">
-            <button className="text-slate-300 hover:text-blue-600 transition-colors p-1 rounded-md hover:bg-blue-50">
-              <Info size={14} />
-            </button>
-            <div className="hidden group-hover/tooltip:block">
-              <VisualSourceTooltip snippet={snippet} />
-            </div>
-          </div>
-        )}
-      </div>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full font-semibold bg-transparent border-none p-0 focus:outline-none text-sm ${highlight ? 'text-blue-600' : 'text-slate-800'}`}
-      />
-    </div>
-  );
 
   const StepIndicator = () => {
     const steps = [
@@ -188,8 +188,8 @@ For and on behalf of ${clientInfo.name}`;
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] p-4 md:p-12 font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 w-screen">
-      <div className="max-w-5xl mx-auto bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-slate-200/50 overflow-hidden border border-white ring-1 ring-slate-200/50">
+    <div className="min-h-screen bg-[#F1F5F9] p-4 font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 w-screen">
+      <div className="w-full bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-slate-200/50 overflow-hidden border border-white ring-1 ring-slate-200/50">
 
         {/* Header */}
         <div className="bg-white/50 p-8 border-b border-slate-100 flex justify-between items-center sticky top-0 z-40 backdrop-blur-md">
@@ -268,7 +268,7 @@ For and on behalf of ${clientInfo.name}`;
                 <p className="text-sm text-slate-500 mt-2 mb-8 max-w-md mx-auto leading-relaxed">
                   Successfully detected <strong>Lease_Final.pdf</strong> (Execution Copy) and <strong>Account_Summary.xlsx</strong> (Arrears Schedule).
                 </p>
-                <button onClick={startLeaseAnalysis} className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-3 mx-auto shadow-lg shadow-blue-200 hover:shadow-blue-300 transform hover:-translate-y-0.5">
+                <button onClick={startLeaseAnalysis} className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-3 mx-auto shadow-lg shadow-blue-200 hover:shadow-blue-300 transform hover:-translate-y-0.5 cursor-pointer">
                   Begin Legal Extraction <ChevronRight size={18} />
                 </button>
               </div>
@@ -300,12 +300,12 @@ For and on behalf of ${clientInfo.name}`;
                 <EditableField label="Service Address" value={tenantInfo.address} onChange={(v) => setTenantInfo({ ...tenantInfo, address: v })} snippet={{ title: "Lease Schedule 1", text: "The Premises: 123 Baker Street..." }} />
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden mb-8 shadow-sm">
+              <div className="bg-white border border-slate-200 rounded-3xl mb-8 shadow-sm overflow-visible">
                 <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center gap-2">
                   <FileText size={14} className="text-slate-400" />
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Extracted Lease Logic</span>
                 </div>
-                <div className="grid md:grid-cols-2 divide-x divide-y divide-slate-100">
+                <div className="grid md:grid-cols-2 divide-x divide-y divide-slate-100 overflow-visible">
                   <EditableField label="Interest Provision" value={leaseClauses.interestClause} snippet={leaseClauses.snippets.interest} onChange={(v) => setLeaseClauses({ ...leaseClauses, interestClause: v })} className="border-none rounded-none shadow-none" />
                   <EditableField label="Calculated Rate" value={leaseClauses.interestRate} snippet={leaseClauses.snippets.interest} onChange={(v) => setLeaseClauses({ ...leaseClauses, interestRate: v })} className="border-none rounded-none shadow-none" />
                   <EditableField label="Administration Charges" value={leaseClauses.adminFee} snippet={{ title: "Lease Clause 7.1", text: "...administrative fee of £50.00 in respect of any late payment..." }} onChange={(v) => setLeaseClauses({ ...leaseClauses, adminFee: v })} className="border-none rounded-none shadow-none" />
@@ -316,7 +316,7 @@ For and on behalf of ${clientInfo.name}`;
               <div className="flex flex-col items-center bg-gradient-to-b from-blue-50/80 to-slate-50/50 rounded-3xl p-10 border border-blue-100/50">
                 <h3 className="text-lg font-bold text-slate-900 mb-6">Select Instrument</h3>
                 <div className="grid md:grid-cols-2 gap-4 w-full max-w-2xl">
-                  <button onClick={() => { setDemandType('service'); setStep('selection') }} className="p-6 bg-white border border-blue-100 rounded-2xl hover:border-blue-400 hover:ring-4 hover:ring-blue-50 hover:shadow-xl transition-all text-left shadow-sm group relative overflow-hidden">
+                  <button onClick={() => { setDemandType('service'); setStep('selection') }} className="p-6 bg-white border border-blue-100 rounded-2xl hover:border-blue-400 hover:ring-4 hover:ring-blue-50 hover:shadow-xl transition-all text-left shadow-sm group relative overflow-hidden cursor-pointer">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-150 group-hover:bg-blue-100/50"></div>
                     <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors relative z-10">
                       <FileText size={20} />
@@ -324,7 +324,7 @@ For and on behalf of ${clientInfo.name}`;
                     <div className="font-bold text-slate-900 relative z-10">Formal Service Demand</div>
                     <div className="text-[11px] text-slate-500 mt-1 font-medium relative z-10">Notice under CPR Part 7 (14 Days)</div>
                   </button>
-                  <button onClick={() => { setDemandType('stat'); setStep('selection') }} className="p-6 bg-white border border-slate-200 rounded-2xl hover:border-slate-800 hover:ring-4 hover:ring-slate-100 hover:shadow-xl transition-all text-left shadow-sm group relative overflow-hidden">
+                  <button onClick={() => { setDemandType('stat'); setStep('selection') }} className="p-6 bg-white border border-slate-200 rounded-2xl hover:border-slate-800 hover:ring-4 hover:ring-slate-100 hover:shadow-xl transition-all text-left shadow-sm group relative overflow-hidden cursor-pointer">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-slate-50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-150 group-hover:bg-slate-100"></div>
                     <div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-slate-800 group-hover:text-white transition-colors relative z-10">
                       <Gavel size={20} />
@@ -396,7 +396,7 @@ For and on behalf of ${clientInfo.name}`;
                   </div>
                   <button
                     onClick={() => { setProcessing(true); setTimeout(() => { setProcessing(false); generateDocument(); }, 1200) }}
-                    className="bg-slate-900 text-white py-4 px-10 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center gap-3 shadow-xl shadow-slate-200 hover:shadow-2xl transform hover:-translate-y-0.5"
+                    className="bg-slate-900 text-white py-4 px-10 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center gap-3 shadow-xl shadow-slate-200 hover:shadow-2xl transform hover:-translate-y-0.5 cursor-pointer"
                   >
                     {processing ? "Formatting Draft..." : <>Generate Instrument <ArrowRight size={18} /></>}
                   </button>
@@ -414,7 +414,7 @@ For and on behalf of ${clientInfo.name}`;
                   <p className="text-slate-500 text-sm mt-1 font-medium">Review and refine the recovery notice below.</p>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={handleCopy} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${copied ? 'bg-emerald-500 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                  <button onClick={handleCopy} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer ${copied ? 'bg-emerald-500 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
                     {copied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Copy Content</>}
                   </button>
                 </div>
@@ -433,10 +433,10 @@ For and on behalf of ${clientInfo.name}`;
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <button className="bg-slate-900 text-white py-4.5 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 hover:shadow-2xl">
+                <button className="bg-slate-900 text-white py-4.5 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 hover:shadow-2xl cursor-pointer">
                   <Download size={20} /> Export Final PDF
                 </button>
-                <button onClick={() => setStep('upload')} className="bg-white border border-slate-200 text-slate-600 py-4.5 rounded-xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-3 hover:border-slate-300">
+                <button onClick={() => setStep('upload')} className="bg-white border border-slate-200 text-slate-600 py-4.5 rounded-xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-3 hover:border-slate-300 cursor-pointer">
                   <Plus size={20} /> New Case
                 </button>
               </div>
